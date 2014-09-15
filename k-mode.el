@@ -3,15 +3,15 @@
 ;; To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/
 ;; or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 ;; -----------------------------------------------------------------------------
-;; File:        e-mode.el
+;; File:        k-mode.el
 ;; Description: k3.3 major mode for emacs.
 ;; Author:      Marc J. Szalkiewicz
 ;; Date:        2014-09-15
 ;; -----------------------------------------------------------------------------
 
-(defvar e-mode-hook nil)
+(defvar k-mode-hook nil)
 
-(defconst e-faces
+(defconst k-faces
   '(("const" font-lock-constant-face)
     ("cmd" font-lock-preprocessor-face)
     ("io" font-lock-builtin-face)
@@ -25,14 +25,14 @@
     ("ctrl" font-lock-keyword-face)
     ("adverb" font-lock-keyword-face)))
 
-(defmacro e-init-faces ()
+(defmacro k-init-faces ()
   `(progn ,@(mapcar (lambda (tpl)
                       `(defface ,(intern (format "k-%s-face" (car tpl)))
                          '((t (:inherit ,(cdr tpl))))
                          ,(format "Face for k-%s." (car tpl))
-                         :group 'e-mode))
-                    e-faces)))
-(e-init-faces)
+                         :group 'k-mode))
+                    k-faces)))
+(k-init-faces)
 
 (defconst k-verbs
   (regexp-opt '("+" "-" "*" "%" "&" "|" "<" ">" "="
@@ -79,15 +79,15 @@
   (regexp-opt '("0#0.0" "!0" "0I" "0N" "0i" "0n" "0Ij" "0Nj"
                 "0#`" "\"\\000\"" "\"\\0\"") nil))
 
-(defconst e-font-lock-keywords-0
+(defconst k-font-lock-keywords-0
   (list
    '("\\(?:[[:space:]^]/.*\\)$" . 'k-cmt-face)
    '("\\(?:\"[^\"]*\"\\)" . 'k-vect-cha-face)
    '("\\(?:`\\(?:\"[^\"]*\"\\|[^0-9][[:alnum:]_.]*\\)\\)" . 'k-atom-sym-face))
   "Syntax highlighting 0 for `k-mode.'")
 
-(defconst e-font-lock-keywords-1
-  (append e-font-lock-keywords-0
+(defconst k-font-lock-keywords-1
+  (append k-font-lock-keywords-0
           `((,k-const . 'k-const-face)
             (,k-os-dialog . 'k-os-face)
             (,k-system-io . 'k-io-face)
@@ -97,27 +97,27 @@
             (,k-verbs . 'k-verb-face)))
   "Syntax highlighting 1 for `k-mode.'")
 
-(defvar e-font-lock-keywords
-  e-font-lock-keywords-1
+(defvar k-font-lock-keywords
+  k-font-lock-keywords-1
   "Default syntax highlighting for `k-mode.'")
 
-(defun e-indent-line ()
+(defun k-indent-line ()
   "Default indentation for `k-mode.'"
   (interactive)
   (beginning-of-line)
   (if (bobp) (indent-line-to 0)
     (let ((not-indented t) cur-indent)
-      (if (looking-at "[)]})")
+      (if (looking-at ".*[)]}).*")
           (progn (save-excursion (forward-line -1)
                                  (setq cur-indent (- (current-indentation)
                                                      default-tab-width)))
                  (if (< cur-indent 0) (setq cur-indent 0)))
         (save-excursion (while not-indented
                           (forward-line -1)
-                          (if (looking-at "[)]}]")
+                          (if (looking-at ".*[)]}].*")
                               (progn (setq cur-indent (current-indentation))
                                      (setq not-indented nil))
-                            (if (looking-at "[([{]")
+                            (if (looking-at ".*[([{].*")
                                 (progn (setq cur-indent (+ (current-indentation)
                                                            default-tab-width))
                                        (setq not-indented-nil))
@@ -132,8 +132,8 @@
 (define-derived-mode k-mode fundamental-mode "kx"
   "Major mode for editing k3.3 programs."
   :syntax-table k-mode-syntax-table
-  (set (make-local-variable 'font-lock-defaults) '(e-font-lock-keywords))
-  ;; (setq-local indent-line-function 'e-indent-line)
+  (set (make-local-variable 'font-lock-defaults) '(k-font-lock-keywords))
+  ;; (setq-local indent-line-function 'k-indent-line)
   )
 
 (add-to-list 'auto-mode-alist '("\\.k\\'" . k-mode))
