@@ -11,11 +11,6 @@
 
 (defvar e-mode-hook nil)
 
-(defun e-mode-dbg-restart ()
-  (interactive)
-  (setq font-lock-major-mode nil)
-  (font-lock-fontify-buffer))
-
 (defconst e-faces
   '(("const" font-lock-constant-face)
     ("cmd" font-lock-preprocessor-face)
@@ -112,17 +107,17 @@
   (beginning-of-line)
   (if (bobp) (indent-line-to 0)
     (let ((not-indented t) cur-indent)
-      (if (looking-at ".*[)]}).*")
+      (if (looking-at "[)]})")
           (progn (save-excursion (forward-line -1)
                                  (setq cur-indent (- (current-indentation)
                                                      default-tab-width)))
                  (if (< cur-indent 0) (setq cur-indent 0)))
         (save-excursion (while not-indented
                           (forward-line -1)
-                          (if (looking-at ".*[)]}].*")
+                          (if (looking-at "[)]}]")
                               (progn (setq cur-indent (current-indentation))
                                      (setq not-indented nil))
-                            (if (looking-at ".*[([{].*")
+                            (if (looking-at "[([{]")
                                 (progn (setq cur-indent (+ (current-indentation)
                                                            default-tab-width))
                                        (setq not-indented-nil))
